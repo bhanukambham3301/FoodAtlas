@@ -53,8 +53,7 @@ Restaurant-Management-System/
 
 **Step 1: Clone the repository**
 
-```bash
-git clone https://github.com/bhanukambham3301
+```bashgit clone https://github.com/bhanukambham3301/FoodAtlas.git
 ```
 
 **Step 2: Navigate to the project folder**
