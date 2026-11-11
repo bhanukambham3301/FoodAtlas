@@ -1,0 +1,15 @@
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Virtual environment
+.venv/
+venv/
+
+# PyCharm settings
+.idea/
+
+# Sensitive information
+.env
+users.json

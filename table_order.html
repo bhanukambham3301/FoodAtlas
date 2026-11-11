@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodAtlas - Table Direct Order</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #141414; color: #fff; }
+        .navbar-custom { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; background: #000; }
+        .brand-logo { color: #E50914; font-size: 1.8rem; font-weight: 800; text-decoration: none; }
+        .cart-btn {
+          background: #E50914; color: white; border: none; padding: 8px 16px;
+          border-radius: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px;
+        }
+        .cart-count { background: white; color: #E50914; padding: 2px 8px; border-radius: 50%; font-size: 0.85rem; }
+        .modal {
+          display: none; position: fixed; z-index: 1000; left: 0; top: 0;
+          width: 100%; height: 100%; background-color: rgba(0,0,0,0.8);
+          justify-content: center; align-items: center;
+        }
+        .modal-content {
+          background-color: #1f1f1f; padding: 30px; border-radius: 8px;
+          width: 90%; max-width: 450px; border: 1px solid #333; position: relative; color: #fff;
+        }
+        .close-modal { position: absolute; right: 15px; top: 15px; color: #aaa; font-size: 1.5rem; cursor: pointer; }
+        .cart-item-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding: 10px 0; }
+
+        /* Active style for Category and Veg filter buttons */
+        .filter-btn.active, .cat-filter-btn.active { background-color: #dc3545 !important; border-color: #dc3545 !important; color: white !important; }
+    </style>
+</head>
+<body>
+
+    <div class="navbar-custom">
+        <a href="/home" class="brand-logo">FoodAtlas</a>
+        <button class="cart-btn" onclick="openCartModal()">
+            🛒 Cart <span class="cart-count" id="cartCount">0</span>
+        </button>
+    </div>
+
+    <div class="container py-4">
+        <!-- టేబుల్ డీటెయిల్స్ -->
+        <div class="card shadow-sm mb-4 bg-dark text-white border-secondary">
+            <div class="card-body">
+                <h5 class="card-title">Enter Your Table Details</h5>
+                <p class="text-muted small mb-3">Restaurant: <strong>{{ restaurant_name }}</strong></p>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Table Number</label>
+                        <input type="text" id="tableNo" class="form-control bg-secondary text-white border-0" placeholder="e.g., Table 4" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Customer Name</label>
+                        <input type="text" id="custName" class="form-control bg-secondary text-white border-0" placeholder="Your Name" required>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. Category Filter Buttons (Starters, Biryani, Soups, Cool Drinks) -->
+        <div class="filter-container" style="margin: 15px 0;">
+    <div class="d-flex flex-wrap gap-2">
+                <button class="cat-filter-btn btn btn-outline-light active" onclick="filterCategory('all', this)">All Categories</button>
+                <button class="cat-filter-btn btn btn-outline-light" onclick="filterCategory('Starters', this)">Starters</button>
+                <button class="cat-filter-btn btn btn-outline-light" onclick="filterCategory('Biryanis', this)">Biryanis</button>
+                <button class="cat-filter-btn btn btn-outline-light" onclick="filterCategory('Soups', this)">Soups</button>
+                <button class="cat-filter-btn btn btn-outline-light" onclick="filterCategory('Breads (Naan & Rotis)', this)">Breads (Naan & Rotis)</button>
+                <button class="cat-filter-btn btn btn-outline-light" onclick="filterCategory('Cool Drinks & Beverages', this)">Cool Drinks & Beverages</button>
+                 <button class="cat-filter-btn btn btn-outline-light" onclick="filterCategory('Curries', this)">Curries</button>
+            </div>
+
+        <!-- 2. Veg/Non-Veg Filter Buttons -->
+        <div class="mb-4">
+            <label class="form-label text-white-50 small">Filter by Type:</label>
+            <div class="d-flex gap-2">
+                <button class="filter-btn btn btn-outline-light active" onclick="filterVeg('all', this)">All Items</button>
+                <button class="filter-btn btn btn-outline-light" onclick="filterVeg('veg', this)">🟢 Pure Veg</button>
+                <button class="filter-btn btn btn-outline-light" onclick="filterVeg('nonveg', this)">🔴 Non-Veg</button>
+            </div>
+        </div>
+
+        <h4 class="mb-3">Available Menu</h4>
+        <div class="row">
+            {% if menu %}
+                {% for item in menu %}
+                <div class="col-md-4 mb-3 food-card" data-category="{{ item.category if item.category is defined else 'all' }}" data-vegtype="{{ item.type | default('Veg') | lower }}">
+                    <div class="card h-100 shadow-sm bg-dark text-white border-secondary">
+                        <img src="{{ item.image }}" class="card-img-top" style="height: 180px; object-fit: cover;" alt="{{ item.name }}">
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="card-title mb-0">{{ item.name }}</h5>
+                                {% if item.type == 'Veg' %}
+                                    <span class="badge bg-success">Veg</span>
+                                {% elif item.type == 'Non-Veg' or item.type == 'NON-VEG' %}
+                                    <span class="badge bg-danger">Non-Veg</span>
+                                {% endif %}
+                            </div>
+                            <p class="text-muted small">{{ item.description }}</p>
+                            <div class="d-flex justify-content-between align-items-center mt-auto">
+                                <span class="fw-bold text-success">{{ item.price }}</span>
+                                <button class="btn btn-sm btn-danger" onclick="addToCart('{{ item.name }}', '{{ item.price }}')">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- కార్ట్ మోడల్ -->
+    <div id="cartModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeCartModal()">&times;</span>
+
+            <div id="cartViewContainer">
+                <h3>Table Order Cart</h3>
+                <div id="cartItemsList" style="margin-bottom: 20px; max-height: 200px; overflow-y: auto;"></div>
+                <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1.1rem; margin-bottom: 20px; border-top: 1px solid #444; padding-top: 10px;">
+                    <span>Total Amount:</span>
+                    <span id="cartTotalPrice" style="color: #46d369;">₹0</span>
+                </div>
+                <button onclick="submitTableOrder()" class="btn btn-danger w-100" id="checkoutBtn" style="display: none;">Send All to Kitchen</button>
+            </div>
+
+            <div id="orderSuccessContainer" style="display: none; text-align: center; padding: 10px;">
+                <div style="font-size: 40px; margin-bottom: 5px;">🎉</div>
+                <h4 style="color: #46d369;">Order Sent to Kitchen!</h4>
+                <div id="successOrderSummary" style="background: #252525; padding: 10px; border-radius: 6px; text-align: left; font-size: 0.85rem; margin-bottom: 15px; color: #ddd;"></div>
+                <button onclick="closeCartModal()" class="btn btn-success w-100">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let cart = [];
+        let currentCategoryFilter = 'all';
+        let currentVegFilter = 'all';
+
+        // కేటగిరీ బటన్ క్లిక్ చేసినప్పుడు పనిచేసే ఫంక్షన్
+        function filterCategory(category, btn) {
+            currentCategoryFilter = category;
+
+            document.querySelectorAll('.cat-filter-btn').forEach(b => {
+                b.classList.remove('btn-danger', 'active');
+                b.classList.add('btn-outline-light');
+            });
+            btn.classList.remove('btn-outline-light');
+            btn.classList.add('btn-danger', 'active');
+
+            applyFilters();
+        }
+
+        // వెజ్ / నాన్-వెజ్ బటన్ క్లిక్ చేసినప్పుడు పనిచేసే ఫంక్షన్
+        function filterVeg(type, btn) {
+            currentVegFilter = type;
+
+            document.querySelectorAll('.filter-btn').forEach(b => {
+                b.classList.remove('btn-danger', 'active');
+                b.classList.add('btn-outline-light');
+            });
+            btn.classList.remove('btn-outline-light');
+            btn.classList.add('btn-danger', 'active');
+
+            applyFilters();
+        }
+
+        // రెండూ ఫిల్టర్లను అప్లై చేసి సరిపోయే ఐటమ్స్‌ని చూపించే ప్రధాన ఫంక్షన్
+        function applyFilters() {
+            document.querySelectorAll('.food-card').forEach(card => {
+                const cardCategory = card.getAttribute('data-category');
+                const cardVegType = card.getAttribute('data-vegtype');
+
+                // కేటగిరీ మ్యాచ్ అవుతుందో లేదో చెక్ చేయుట
+                let matchesCategory = (currentCategoryFilter === 'all') || (cardCategory.toLowerCase() === currentCategoryFilter.toLowerCase());
+
+                // వెజ్/నాన్-వెజ్ మ్యాచ్ అవుతుందో లేదో చెక్ చేయుట
+                let matchesVeg = true;
+                if (currentVegFilter === 'veg') {
+                    matchesVeg = cardVegType.includes('veg') && !cardVegType.includes('non');
+                } else if (currentVegFilter === 'nonveg') {
+                    matchesVeg = cardVegType.includes('non') || cardVegType.includes('non-veg');
+                }
+
+                // రెండూ మ్యాచ్ అయితేనే డిస్‌ప్లే అవ్వాలి
+                if (matchesCategory && matchesVeg) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function addToCart(name, priceStr) {
+            let numericPrice = parseFloat(priceStr.replace(/[^0-9.]/g, '')) || 0;
+            let existingItem = cart.find(item => item.name === name);
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ name: name, priceStr: priceStr, price: numericPrice, quantity: 1 });
+            }
+            updateCartUI();
+            alert(`✅ "${name}" కార్ట్‌కి జోడించబడింది!`);
+        }
+
+        function updateCartUI() {
+            let totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cartCount').innerText = totalCount;
+
+            let cartItemsList = document.getElementById('cartItemsList');
+            let totalPriceElem = document.getElementById('cartTotalPrice');
+            let checkoutBtn = document.getElementById('checkoutBtn');
+
+            if (cart.length === 0) {
+                cartItemsList.innerHTML = `<p style="color: #888; text-align: center; padding: 15px;">Your cart is empty!</p>`;
+                totalPriceElem.innerText = "₹0";
+                checkoutBtn.style.display = 'none';
+                return;
+            }
+
+            let html = '';
+            let totalAmount = 0;
+
+            cart.forEach((item, index) => {
+                let itemTotal = item.price * item.quantity;
+                totalAmount += itemTotal;
+                html += `
+                    <div class="cart-item-row">
+                        <div>
+                            <strong>${item.name}</strong><br>
+                            <span style="color: #46d369; font-size: 0.85rem;">${item.priceStr} x ${item.quantity}</span>
+                        </div>
+                        <div>
+                            <button onclick="changeQty(${index}, -1)" class="btn btn-sm btn-dark">-</button>
+                            <span style="margin: 0 6px;">${item.quantity}</span>
+                            <button onclick="changeQty(${index}, 1)" class="btn btn-sm btn-dark">+</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            cartItemsList.innerHTML = html;
+            totalPriceElem.innerText = "₹" + totalAmount.toFixed(2);
+            checkoutBtn.style.display = 'block';
+        }
+
+        function changeQty(index, change) {
+            cart[index].quantity += change;
+            if (cart[index].quantity <= 0) { cart.splice(index, 1); }
+            updateCartUI();
+        }
+
+        function openCartModal() {
+            document.getElementById('cartViewContainer').style.display = 'block';
+            document.getElementById('orderSuccessContainer').style.display = 'none';
+            document.getElementById('cartModal').style.display = 'flex';
+            updateCartUI();
+        }
+
+        function closeCartModal() { document.getElementById('cartModal').style.display = 'none'; }
+
+        function submitTableOrder() {
+            const tableNo = document.getElementById('tableNo').value.trim();
+            const custName = document.getElementById('custName').value.trim();
+
+            if (!tableNo || !custName) {
+                alert("దయచేసి ముందుగా మీ టేబుల్ నంబర్ మరియు పేరు ఎంటర్ చేయండి!");
+                closeCartModal();
+                document.getElementById('tableNo').focus();
+                return;
+            }
+
+            let itemsSummary = cart.map(i => `${i.name} (x${i.quantity})`).join(', ');
+            let totalAmount = document.getElementById('cartTotalPrice').innerText;
+
+            const orderData = {
+                restaurant: "{{ restaurant_name }}",
+                table_no: tableNo,
+                customer_name: custName,
+                items: cart,
+                total: totalAmount
+            };
+
+            fetch('/table-order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(orderData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                const summaryHTML = `
+                  <strong>Table No:</strong> ${tableNo}<br>
+                  <strong>Name:</strong> ${custName}<br>
+                  <strong>Items:</strong> ${itemsSummary}<br>
+                  <strong>Total:</strong> ${totalAmount}
+                `;
+                document.getElementById('successOrderSummary').innerHTML = summaryHTML;
+                document.getElementById('cartViewContainer').style.display = 'none';
+                document.getElementById('orderSuccessContainer').style.display = 'block';
+                cart = [];
+                updateCartUI();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const summaryHTML = `
+                  <strong>Table No:</strong> ${tableNo}<br>
+                  <strong>Name:</strong> ${custName}<br>
+                  <strong>Items:</strong> ${itemsSummary}<br>
+                  <strong>Total:</strong> ${totalAmount}
+                `;
+                document.getElementById('successOrderSummary').innerHTML, summaryHTML;
+                document.getElementById('cartViewContainer').style.display = 'none';
+                document.getElementById('orderSuccessContainer').style.display = 'block';
+                cart = [];
+                updateCartUI();
+            });
+        }
+    </script>
+</body>
+</html>

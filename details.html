@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FoodAtlas - Online & Table Ordering</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
+    body { background-color: #141414; color: #fff; padding-bottom: 50px; }
+
+    .navbar { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; background: #000; }
+    .brand-logo { color: #E50914; font-size: 1.8rem; font-weight: 800; text-decoration: none; }
+    .nav-right { display: flex; align-items: center; gap: 20px; }
+    .back-btn { color: #aaa; text-decoration: none; font-weight: 600; }
+
+    .cart-btn {
+      background: #E50914; color: white; border: none; padding: 8px 16px;
+      border-radius: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px;
+    }
+    .cart-count { background: white; color: #E50914; padding: 2px 8px; border-radius: 50%; font-size: 0.85rem; }
+
+    .header { padding: 30px 40px; background: #1c1c1c; border-bottom: 1px solid #333; }
+    .title { font-size: 2.2rem; }
+
+    .container { padding: 30px 40px; }
+
+    .table-order-banner {
+      background: linear-gradient(135deg, #f5af19, #f12711);
+      color: white; padding: 15px 20px; border-radius: 8px;
+      text-align: center; text-decoration: none; font-weight: bold;
+      display: block; margin-bottom: 30px; font-size: 1.1rem;
+      box-shadow: 0 4px 15px rgba(241, 39, 17, 0.3);
+    }
+    .table-order-banner:hover { color: white; }
+
+    .filter-box { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+
+    /* కామన్ ఫిల్టర్ బటన్ స్టైల్ మరియు యాక్టివ్ రెడ్ కలర్ కోసం */
+    .filter-btn {
+      background: #222; color: #fff; border: 1px solid #444;
+      padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .filter-btn.active-custom { background: #E50914; border-color: #E50914; color: white; }
+
+    .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+    .food-card { background: #181818; border-radius: 8px; overflow: hidden; border: 1px solid #222; display: flex; flex-direction: column; justify-content: space-between; }
+    .food-img { width: 100%; height: 160px; object-fit: cover; }
+    .food-info { padding: 15px; }
+    .food-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+    .food-price { color: #46d369; font-weight: bold; }
+    .badge-veg { color: #2ed573; font-size: 0.8rem; font-weight: bold; display: inline-block; margin-bottom: 8px; }
+    .badge-nonveg { color: #ff4757; font-size: 0.8rem; font-weight: bold; display: inline-block; margin-bottom: 8px; }
+    .food-desc { color: #888; font-size: 0.85rem; margin-top: 8px; }
+
+    .add-to-cart-btn {
+      background-color: #E50914; color: white; border: none;
+      padding: 10px 12px; margin: 15px; border-radius: 4px;
+      font-weight: bold; cursor: pointer; transition: background 0.2s;
+    }
+    .add-to-cart-btn:hover { background-color: #f6121d; }
+
+    .modal {
+      display: none; position: fixed; z-index: 1000; left: 0; top: 0;
+      width: 100%; height: 100%; background-color: rgba(0,0,0,0.8);
+      justify-content: center; align-items: center;
+    }
+    .modal-content {
+      background-color: #1f1f1f; padding: 30px; border-radius: 8px;
+      width: 90%; max-width: 480px; border: 1px solid #333; position: relative;
+      max-height: 90vh; overflow-y: auto; color: #fff;
+    }
+    .close-modal {
+      position: absolute; right: 15px; top: 15px; color: #aaa;
+      font-size: 1.5rem; cursor: pointer; font-weight: bold;
+    }
+    .cart-item-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding: 10px 0; font-size: 0.95rem; }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; font-size: 0.9rem; color: #aaa; margin-bottom: 5px; }
+    .form-group input, .form-group textarea, .form-group select {
+      width: 100%; padding: 10px; background: #2a2a2a; border: 1px solid #444;
+      color: #fff; border-radius: 4px; font-size: 1rem;
+    }
+    .submit-order-btn {
+      width: 100%; background: #E50914; color: white; border: none;
+      padding: 12px; font-weight: bold; border-radius: 4px; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="navbar">
+    <a href="/home" class="brand-logo">FoodAtlas</a>
+    <div class="nav-right">
+      <button class="cart-btn" onclick="openCartModal()">
+        🛒 Cart <span class="cart-count" id="cartCount">0</span>
+      </button>
+      <a href="/search?city={{ city }}" class="back-btn">← Restaurants</a>
+    </div>
+  </header>
+
+  <div class="header">
+    <h1 class="title">🍽️ {{ restaurant_name }}</h1>
+    <p style="color: #888;">Food Menu & Pricing in {{ city }}</p>
+  </div>
+
+  <main class="container">
+    <a href="{{ url_for('table_order', name=restaurant_name, city=city) }}" class="table-order-banner">
+      📱 Dine-In / Direct Table Order (No Menu Card Needed)
+    </a>
+
+    <!-- 1. Veg / Non-Veg ఫిల్టర్ బటన్స్ -->
+    <div class="filter-box" id="veg-filters">
+      <button class="filter-btn active-custom" data-type="All">All Items</button>
+      <button class="filter-btn" data-type="Veg">🟢 Pure Veg</button>
+      <button class="filter-btn" data-type="Non-Veg">🔴 Non-Veg</button>
+    </div>
+
+    <!-- 2. కేటగిరీ ఫిల్టర్ బటన్స్ (Starters, Biryanis, మొదలైనవి) -->
+    <div class="filter-box" id="category-filters" style="margin-bottom: 30px;">
+        <button class="filter-btn active-custom" data-category="All">All Categories</button>
+        <button class="filter-btn" data-category="Starters">Starters</button>
+        <button class="filter-btn" data-category="Biryanis">Biryanis</button>
+        <button class="filter-btn" data-category="Soups">Soups</button>
+        <button class="filter-btn" data-category="Breads (Naan & Rotis)">Breads (Naan & Rotis)</button>
+        <button class="filter-btn" data-category="Cool Drinks & Beverages">Cool Drinks & Beverages</button>
+         <button class="filter-btn" data-category="curries">curries</button>
+    </div>
+
+    <div class="menu-grid">
+      {% for item in menu %}
+        <!-- ఇక్కడ data-category మరియు data-type సరిగ్గా ఉండేలా చూడబడింది -->
+        <div class="food-card" data-category="{{ item.category | default('Starters') }}" data-type="{{ item.type | default('veg') }}">
+          <div>
+            <img src="{{ item.image }}" alt="{{ item.name }}" class="food-img">
+            <div class="food-info">
+              <div class="food-header">
+                <h3>{{ item.name }}</h3>
+                <span class="food-price">{{ item.price }}</span>
+              </div>
+              {% if item.type | default('veg') | lower == 'veg' %}
+                <span class="badge-veg">🟢 PURE VEG</span>
+              {% else %}
+                <span class="badge-nonveg">🔴 NON-VEG</span>
+              {% endif %}
+              <p class="food-desc">{{ item.description }}</p>
+            </div>
+          </div>
+          <button class="add-to-cart-btn" onclick="addToCart('{{ item.name }}', '{{ item.price }}')">Add to Cart</button>
+        </div>
+      {% endfor %}
+    </div>
+  </main>
+
+  <div id="cartModal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal" onclick="closeCartModal()">&times;</span>
+
+      <div id="cartViewContainer">
+        <h3>Your Food Cart</h3>
+        <div id="cartItemsList" style="margin-bottom: 20px; max-height: 200px; overflow-y: auto;"></div>
+        <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1.1rem; margin-bottom: 20px; border-top: 1px solid #444; padding-top: 10px;">
+          <span>Total Amount:</span>
+          <span id="cartTotalPrice" style="color: #46d369;">₹0</span>
+        </div>
+        <button onclick="proceedToCheckout()" class="submit-order-btn" id="checkoutBtn" style="display: none;">Proceed to Checkout</button>
+      </div>
+
+      <div id="checkoutFormContainer" style="display: none;">
+        <h3>Complete Your Order</h3>
+        <form onsubmit="submitOrder(event)">
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="customerName" placeholder="Enter your name" required>
+          </div>
+          <div class="form-group">
+            <label>Phone Number</label>
+            <input type="tel" id="customerPhone" placeholder="10-digit mobile number" pattern="[0-9]{10}" required>
+          </div>
+          <div class="form-group">
+            <label>Delivery Address</label>
+            <textarea id="customerAddress" placeholder="House No, Street, City" required></textarea>
+          </div>
+          <div class="form-group">
+            <label>Payment Method</label>
+            <select id="paymentMethod" required>
+              <option value="cod">Cash on Delivery (COD)</option>
+              <option value="online">Online Payment (UPI / QR Code)</option>
+            </select>
+          </div>
+          <button type="submit" class="submit-order-btn">Confirm & Place Order</button>
+        </form>
+      </div>
+
+      <div id="orderSuccessContainer" style="display: none; text-align: center; padding: 20px;">
+        <div style="font-size: 50px; margin-bottom: 10px;">🎉</div>
+        <h2 style="color: #46d369; margin-bottom: 10px;">Order Confirmed!</h2>
+        <div id="successOrderSummary" style="background: #252525; padding: 12px; border-radius: 6px; text-align: left; font-size: 0.85rem; margin-bottom: 20px; color: #ddd;"></div>
+        <button onclick="closeCartModal()" class="submit-order-btn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let cart = [];
+    let currentCategoryFilter = 'All';
+    let currentVegFilter = 'All';
+
+    // 1. Veg / Non-Veg బటన్స్ ఈవెంట్
+    const typeButtons = document.querySelectorAll('#veg-filters .filter-btn');
+    typeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            typeButtons.forEach(btn => btn.classList.remove('active-custom'));
+            button.classList.add('active-custom');
+
+            currentVegFilter = button.getAttribute('data-type') || 'All';
+            applyFilters();
+        });
+    });
+
+    // 2. కేటగిరీ బటన్స్ ఈవెంట్
+    const categoryButtons = document.querySelectorAll('#category-filters .filter-btn');
+    categoryButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            categoryButtons.forEach(btn => btn.classList.remove('active-custom'));
+            button.classList.add('active-custom');
+
+            currentCategoryFilter = button.getAttribute('data-category') || 'All';
+            applyFilters();
+        });
+    });
+
+    // 3. రెండింటిని బేస్ చేసుకుని ఫిల్టర్ చేసే మెయిన్ ఫంక్షన్
+    function applyFilters() {
+        const cards = document.querySelectorAll('.food-card');
+
+        cards.forEach(card => {
+            const cardCategory = (card.getAttribute('data-category') || '').trim().toLowerCase();
+            const cardVegType = (card.getAttribute('data-vegtype') || card.getAttribute('data-type') || '').trim().toLowerCase();
+
+            const targetCategory = currentCategoryFilter.trim().toLowerCase();
+            const targetVeg = currentVegFilter.trim().toLowerCase();
+
+            // కేటగిరీ మ్యాచ్ అవుతుందా లేదా
+            let matchesCategory = (targetCategory === 'all') || (cardCategory === targetCategory);
+
+            // వెజ్ / నాన్-వెజ్ మ్యాచ్ అవుతుందా లేదా
+            let matchesVeg = true;
+            if (targetVeg === 'veg') {
+                matchesVeg = cardVegType.includes('veg') && !cardVegType.includes('non');
+            } else if (targetVeg === 'non-veg' || targetVeg === 'nonveg') {
+                matchesVeg = cardVegType.includes('non') || cardVegType.includes('non-veg');
+            }
+
+            // రెండూ సరిపోలితే కార్డ్ చూపించు, లేదంటే దాచు
+            if (matchesCategory && matchesVeg) {
+                card.style.display = 'flex';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    function addToCart(name, priceStr) {
+      let numericPrice = parseFloat(priceStr.replace(/[^0-9.]/g, '')) || 0;
+      let existingItem = cart.find(item => item.name === name);
+      if (existingItem) {
+        existingItem.quantity += 1;
+      } else {
+        cart.push({ name: name, priceStr: priceStr, price: numericPrice, quantity: 1 });
+      }
+      updateCartUI();
+      alert(`✅ "${name}" కార్ట్‌కి జోడించబడింది!`);
+    }
+
+    function updateCartUI() {
+      let totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+      document.getElementById('cartCount').innerText = totalCount;
+
+      let cartItemsList = document.getElementById('cartItemsList');
+      let totalPriceElem = document.getElementById('cartTotalPrice');
+      let checkoutBtn = document.getElementById('checkoutBtn');
+
+      if (cart.length === 0) {
+        cartItemsList.innerHTML = `<p style="color: #888; text-align: center; padding: 20px;">Your cart is empty!</p>`;
+        totalPriceElem.innerText = "₹0";
+        checkoutBtn.style.display = 'none';
+        return;
+      }
+
+      let html = '';
+      let totalAmount = 0;
+
+      cart.forEach((item, index) => {
+        let itemTotal = item.price * item.quantity;
+        totalAmount += itemTotal;
+        html += `
+          <div class="cart-item-row">
+            <div>
+              <strong>${item.name}</strong><br>
+              <span style="color: #46d369; font-size: 0.85rem;">${item.priceStr} x ${item.quantity}</span>
+            </div>
+            <div>
+              <button onclick="changeQty(${index}, -1)" style="background:#333; color:#fff; border:none; padding:2px 8px; cursor:pointer;">-</button>
+              <span style="margin: 0 8px;">${item.quantity}</span>
+              <button onclick="changeQty(${index}, 1)" style="background:#333; color:#fff; border:none; padding:2px 8px; cursor:pointer;">+</button>
+            </div>
+          </div>
+        `;
+      });
+
+      cartItemsList.innerHTML = html;
+      totalPriceElem.innerText = "₹" + totalAmount.toFixed(2);
+      checkoutBtn.style.display = 'block';
+    }
+
+    function changeQty(index, change) {
+      cart[index].quantity += change;
+      if (cart[index].quantity <= 0) { cart.splice(index, 1); }
+      updateCartUI();
+    }
+
+    function openCartModal() {
+      document.getElementById('cartViewContainer').style.display = 'block';
+      document.getElementById('checkoutFormContainer').style.display = 'none';
+      document.getElementById('orderSuccessContainer').style.display = 'none';
+      document.getElementById('cartModal').style.display = 'flex';
+      updateCartUI();
+    }
+
+    function closeCartModal() { document.getElementById('cartModal').style.display = 'none'; }
+    function proceedToCheckout() {
+      document.getElementById('cartViewContainer').style.display = 'none';
+      document.getElementById('checkoutFormContainer').style.display = 'block';
+    }
+
+    function submitOrder(event) {
+      event.preventDefault();
+      const name = document.getElementById('customerName', '').value;
+      const phone = document.getElementById('customerPhone').value;
+      const address = document.getElementById('customerAddress').value;
+      const payment = document.getElementById('paymentMethod').value.toUpperCase();
+
+      let itemsSummary = cart.map(i => `${i.name} (x${i.quantity})`).join(', ');
+      let totalAmount = document.getElementById('cartTotalPrice').innerText;
+
+      const summaryHTML = `
+        <strong>Items:</strong> ${itemsSummary}<br>
+        <strong>Total:</strong> ${totalAmount}<br>
+        <strong>Name:</strong> ${name}<br>
+        <strong>Phone:</strong> ${phone}<br>
+        <strong>Address:</strong> ${address}<br>
+        <strong>Payment:</strong> ${payment}
+      `;
+
+      document.getElementById('successOrderSummary').innerHTML = summaryHTML;
+      document.getElementById('checkoutFormContainer').style.display = 'none';
+      document.getElementById('orderSuccessContainer').style.display = 'block';
+      cart = [];
+      updateCartUI();
+    }
+  </script>
+</body>
+</html>

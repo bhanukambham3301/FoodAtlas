@@ -1,0 +1,181 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+/* Welcome Hero Section */
+.hero {
+  height: 60vh;
+  background: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)),
+              url('https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: #ffffff;
+  padding: 0 20px;
+}
+
+.hero h1 {
+  font-size: 3.2rem;
+  margin-bottom: 10px;
+}
+
+.hero p {
+  font-size: 1.1rem;
+  max-width: 600px;
+  margin-bottom: 25px;
+  opacity: 0.9;
+}
+
+/* Search Bar Panel */
+.search-panel {
+  display: flex;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(8px);
+  padding: 10px;
+  border-radius: 50px;
+  width: 100%;
+  max-width: 520px;
+}
+
+.search-panel input {
+  flex: 1;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 30px;
+  font-size: 1rem;
+  outline: none;
+}
+
+.search-panel button {
+  padding: 12px 26px;
+  border: none;
+  border-radius: 30px;
+  background-color: #ff4757;
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.search-panel button:hover {
+  background-color: #e84118;
+}
+
+/* Side-by-Side Cards Layout */
+.results-container {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.restaurant-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+  margin-top: 20px;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+}
+
+.card img {
+  width: 100%;
+  height: 190px;
+  object-fit: cover;
+}
+
+.card-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-grow: 1;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.card-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.rating-badge {
+  background: #2ed573;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+
+.card-cuisines {
+  color: #ff4757;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.card-address {
+  color: #666;
+  font-size: 0.85rem;
+  margin-top: auto;
+}
+
+/* Filter Section Styling */
+.filter-container {
+  margin: 20px 0;
+}
+
+.filter-label {
+  display: block;
+  margin-bottom: 10px;
+  color: #bbb;
+  font-size: 14px;
+}
+
+.buttons-group {
+  display: flex;
+  flex-wrap: wrap; /* స్పేస్ చాలకపోతే నెక్స్ట్ లైన్‌కి సర్దుకుంటుంది */
+  gap: 10px;        /* బటన్స్ మధ్య గ్యాప్ */
+}
+
+.filter-btn {
+  padding: 8px 16px;
+  border: 1px solid #444;
+  background-color: transparent;
+  color: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.filter-btn:hover {
+  border-color: #ff4d4d;
+}
+
+/* యాక్టివ్ బటన్ కోసం */
+.filter-btn.active-custom {
+  background-color: #e53935;
+  border-color: #e53935;
+  color: #fff;
+}

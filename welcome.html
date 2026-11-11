@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome | FoodAtlas</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* Full-screen Background Container */
+    .welcome-screen {
+      height: 100vh;
+      width: 100vw;
+
+      /* Option A: Using your local background image in static/images/background.jpg */
+      background: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)),
+                  url("{{ url_for('static', filename='images/background.jpg') }}") center/cover no-repeat;
+
+      /* Option B: (Fallback online URL if local image is not found) */
+      /* background: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)),
+                  url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat; */
+
+      display: flex;
+      justify-content: center; /* Horizontally centered */
+      align-items: center;     /* Vertically centered */
+      padding: 20px;
+    }
+
+    /* Centered Content Box */
+    .center-panel {
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 50px 40px;
+      text-align: center;
+      color: #ffffff;
+      max-width: 580px;
+      width: 100%;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .heading {
+      font-size: 3.5rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+      letter-spacing: 1px;
+      color: #ffffff;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+
+    .description {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      color: #e0e0e0;
+      margin-bottom: 30px;
+    }
+
+    /* Centered Open Button */
+    .open-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 45px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #ffffff;
+      background-color: #ff4757;
+      border: none;
+      border-radius: 50px;
+      text-decoration: none;
+      box-shadow: 0 8px 20px rgba(255, 71, 87, 0.4);
+      transition: all 0.3s ease;
+    }
+
+    .open-btn:hover {
+      background-color: #e84118;
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 12px 25px rgba(255, 71, 87, 0.6);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Full-Screen Background -->
+  <div class="welcome-screen">
+    <!-- Centered Box -->
+    <div class="center-panel">
+      <h1 class="heading">FoodieIndia</h1>
+      <p class="description">
+        Discover top-rated dining spots, iconic street foods, addresses, and curated restaurant recommendations across India.
+      </p>
+
+      <!-- Open Button -->
+      <!-- Inside welcome.html -->
+<a href="/login" class="signin-btn">Sign In</a>
+        Open <span>➔</span>
+      </a>
+    </div>
+  </div>
+
+</body>
+</html>

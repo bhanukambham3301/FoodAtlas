@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FoodieIndia | Recommendations</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+
+    /* Netflix Dark Background */
+    body {
+      background-color: #141414;
+      color: #ffffff;
+      min-height: 100vh;
+      padding-bottom: 50px;
+    }
+
+    /* Top Navigation Bar */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      background: linear-gradient(180deg, rgba(0,0,0,0.9) 0%, rgba(20,20,20,0) 100%);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(5px);
+    }
+
+    .brand-logo {
+      color: #E50914; /* Netflix Red */
+      font-size: 1.8rem;
+      font-weight: 800;
+      text-decoration: none;
+      letter-spacing: 1px;
+    }
+
+    /* Top Right Search Bar */
+    .nav-search {
+      display: flex;
+      gap: 8px;
+    }
+
+    .nav-search input {
+      background: rgba(0, 0, 0, 0.75);
+      border: 1px solid #333;
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      outline: none;
+      width: 220px;
+      transition: border-color 0.3s ease;
+    }
+
+    .nav-search input:focus {
+      border-color: #E50914;
+    }
+
+    .nav-search button {
+      background-color: #E50914;
+      border: none;
+      color: white;
+      padding: 8px 18px;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .nav-search button:hover {
+      background-color: #b80710;
+    }
+
+    /* Main Section Container */
+    .main-container {
+      padding: 20px 40px;
+    }
+
+    .row-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: #e5e5e5;
+    }
+
+    /* Netflix-style Side-by-Side Grid */
+    .netflix-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    /* Restaurant Card */
+    .card {
+      background-color: #181818;
+      border-radius: 6px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #222;
+    }
+
+    /* Hover Zoom Effect like Netflix */
+    .card:hover {
+      transform: scale(1.05);
+      z-index: 10;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8);
+      border-color: #444;
+    }
+
+    /* Image Prominently Featured on Top */
+    .card-img-container {
+      width: 100%;
+      height: 160px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-img-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Content Area Below Image */
+    .card-info {
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex-grow: 1;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .meta-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Rating Badge */
+    .rating-badge {
+      color: #46d369; /* Netflix Green match color */
+      font-weight: 800;
+      font-size: 0.9rem;
+    }
+
+    .match-percent {
+      font-size: 0.8rem;
+      color: #aaa;
+      border: 1px solid #555;
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+
+    /* Cuisine Info */
+    .card-cuisine {
+      font-size: 0.85rem;
+      color: #e5e5e5;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Address Info */
+    .card-address {
+      font-size: 0.8rem;
+      color: #777;
+      line-height: 1.3;
+      margin-top: auto;
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 80px 20px;
+      color: #aaa;
+    }
+
+    .no-results h2 {
+      font-size: 2rem;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="navbar">
+    <a href="/" class="brand-logo">FOODIEINDIA</a>
+
+    <form action="/search" method="GET" class="nav-search">
+      <input type="text" name="city" value="{{ city }}" placeholder="Search City..." required>
+      <button type="submit">Search</button>
+    </form>
+  </header>
+
+  <!-- Main Content Grid -->
+  <main class="main-container">
+    {% if restaurants %}
+      <h2 class="row-title">Top Searches in "{{ city }}"</h2>
+
+      <div class="netflix-grid">
+        {% for rest in restaurants %}
+          <div class="card">
+            <!-- Restaurant Image -->
+            <div class="card-img-container">
+              <img src="{{ rest.image }}" alt="{{ rest.name }}">
+            </div>
+
+            <!-- Details Below Image: Rating, Cuisine, Address -->
+            <div class="card-info">
+              <div class="card-title">{{ rest.name }}</div>
+
+              <div class="meta-row">
+                <span class="rating-badge">★ {{ rest.rating }}</span>
+                <span class="match-percent">HD</span>
+              </div>
+
+              <div class="card-cuisine">🍽️ {{ rest.cuisine }}</div>
+              <div class="card-address">📍 {{ rest.address }}</div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="no-results">
+        <h2>No restaurants found in "{{ city }}"</h2>
+        <p>Try searching for popular cities like <strong>Mumbai</strong>, <strong>Delhi</strong>, <strong>Bengaluru</strong>, or <strong>Hyderabad</strong>.</p>
+      </div>
+    {% endif %}
+  </main>
+
+</body>
+</html>
