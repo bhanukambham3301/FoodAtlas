@@ -1,80 +1,102 @@
-# 🍽️ Restaurant Management System
+# 🍽️ FoodAtlas – Restaurant Recommendation System
+
+### Discover Restaurants. Explore Menus. Enjoy Food!
 
 ## 📌 About the Project
 
-The Restaurant Management System is a web-based application developed using Python and Flask. This project aims to provide a simple and user-friendly platform for managing restaurant-related information.
+FoodAtlas is a web-based restaurant recommendation application developed using Python and Flask. It provides a user-friendly platform to explore restaurant information, search for restaurants and view menu-related details.
 
-It combines frontend and backend technologies to create an interactive restaurant application.
+The project combines frontend and backend technologies to create an interactive restaurant experience.
 
 ## 🎯 Objectives
 
 - To develop a user-friendly restaurant web application.
-- To understand Python Flask web development.
-- To manage and process restaurant-related data.
-- To gain practical experience in frontend and backend development.
+- To provide restaurant information through a web interface.
+- To explore restaurant menu details.
+- To gain practical experience in Python and Flask development.
+- To understand frontend and backend integration.
 
 ## ✨ Features
 
 - User-friendly web interface.
-- Restaurant-related information management.
-- Menu data handling.
+- Restaurant search functionality.
+- Restaurant information and details pages.
+- Menu-related information.
+- Login and signup pages.
+- Table ordering interface.
 - Interactive web pages.
-- Data management using Python.
 
-*Note: Keep only the features that are actually implemented in your project.*
+*Only retain features that are fully implemented and working in your application.*
 
 ## 🛠️ Technologies Used
 
-- Python
-- Flask
-- HTML
-- CSS
-- JavaScript
-- Pandas
-- CSV
-- JSON
+| Technology | Purpose |
+|---|---|
+| Python | Backend programming |
+| Flask | Web framework |
+| HTML | Web page structure |
+| CSS | Styling and design |
+| JavaScript | Interactive functionality |
+| Pandas | Data processing |
+| CSV | Restaurant data storage |
 
 ## 📂 Project Structure
 
 ```text
-Restaurant-Management-System/
+FoodAtlas/
 │
-├── static/
-├── templates/
-├── utils/
 ├── app.py
+├── helper.py
 ├── menu_data.py
 ├── restaurants.csv
 ├── requirements.txt
+│
+├── index.html
+├── welcome.html
+├── login.html
+├── signup.html
+├── search.html
+├── results.html
+├── details.html
+├── menu.html
+├── table_order.html
+│
+├── style.css
+├── script.js
+│
+├── .gitignore
 └── README.md
 ```
 
 ## ⚙️ Installation and Setup
 
-**Step 1: Clone the repository**
-
-```bashgit clone https://github.com/bhanukambham3301/FoodAtlas.git
-```
-
-**Step 2: Navigate to the project folder**
+### Step 1: Clone the repository
 
 ```bash
-cd Restaurant-Management-System
+git clone https://github.com/bhanukambham3301/FoodAtlas.git
 ```
 
-**Step 3: Install dependencies**
+### Step 2: Navigate to the project directory
+
+```bash
+cd FoodAtlas
+```
+
+### Step 3: Install required dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-**Step 4: Run the application**
+### Step 4: Run the application
 
 ```bash
 python app.py
 ```
 
-**Step 5: Open in your browser**
+### Step 5: Open the application
+
+Open your browser and visit:
 
 ```text
 http://127.0.0.1:5000/
@@ -82,17 +104,22 @@ http://127.0.0.1:5000/
 
 ## 🎓 Learning Outcomes
 
-- Learned Python application development.
-- Gained practical knowledge of Flask.
-- Understood HTML, CSS and JavaScript integration.
-- Improved data handling and project development skills.
+- Practical experience with Python programming.
+- Understanding Flask web application development.
+- Knowledge of frontend and backend integration.
+- Experience in handling restaurant datasets.
+- Improved problem-solving and web development skills.
 
-## 👩‍💻 Author
+## 👩‍💻 Developed By
 
 **Bhanu Kambham**
 
 B.Sc. Artificial Intelligence Student
 
+## 📌 Project Repository
+
+GitHub: https://github.com/bhanukambham3301/FoodAtlas
+
 ## 📄 License
 
-This project is developed for educational purposes.
+This project is developed for educational and learning purposes.
